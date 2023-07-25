@@ -2,7 +2,7 @@ package com.example.webflux.usecase;
 
 import com.example.webflux.repository.WebClientRepository;
 import com.example.webflux.response.GetEmployeePageInfoResponse;
-import com.example.webflux.response.external.GetEmployeesResponse;
+import com.example.webflux.response.external.GetEmployeeResponse;
 import com.example.webflux.response.external.GetPositionsResponse;
 import com.example.webflux.response.external.GetSkillPerTypeResponse;
 import com.example.webflux.response.external.GetSkillPerTypeResponse.SkillPerTypeResponse;
@@ -19,21 +19,21 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GetEmployeePageInfoUseCase {
 
-    private final WebClientRepository<Void, GetEmployeesResponse> employeeRepository;
+    private final WebClientRepository<Void, GetEmployeeResponse> employeeRepository;
     private final WebClientRepository<Void, GetSkillPerTypeResponse> skillRepository;
     private final WebClientRepository<Void, GetPositionsResponse> positionRepository;
 
     public Mono<GetEmployeePageInfoResponse> execute(ServerRequest req) {
         return Mono.zip(
-                employeeRepository.get(req, "/employee/" + req.pathVariable("employeeId"), GetEmployeesResponse.class),
+                employeeRepository.get(req, "/employee/" + req.pathVariable("employeeId"), GetEmployeeResponse.class),
                 skillRepository.get(req, "/skill/per_type", GetSkillPerTypeResponse.class),
                 positionRepository.get(req, "/position", GetPositionsResponse.class)
         ).map(tuple2 -> (
-                GetEmployeePageInfoResponse.builder()
-                        .employee(tuple2.getT1())
-                        .skills(setHasSkill(tuple2.getT1().getSkills(), tuple2.getT2().getSkills()))
-                        .positions(setEmployeePosition(tuple2.getT3(), tuple2.getT1().getPositionId()).getPositions())
-                        .build()
+                        GetEmployeePageInfoResponse.builder()
+                                .employee(tuple2.getT1())
+                                .skills(setHasSkill(tuple2.getT1().getSkills(), tuple2.getT2().getSkills()))
+                                .positions(setEmployeePosition(tuple2.getT3(), tuple2.getT1().getPositionId()).getPositions())
+                                .build()
                 )
         );
     }

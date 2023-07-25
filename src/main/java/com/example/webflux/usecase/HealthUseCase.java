@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class HealthUseCase {
     private final WebClientRepository<Void, String> repository;
+
     public Mono<String> execute(ServerRequest req) {
         return repository.get(req, "/health", String.class);
     }

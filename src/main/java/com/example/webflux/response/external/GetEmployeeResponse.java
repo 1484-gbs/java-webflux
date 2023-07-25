@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-public class GetEmployeesResponse {
+public class GetEmployeeResponse {
     @JsonProperty("first_name")
     private String firstName;
     @JsonProperty("last_name")

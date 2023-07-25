@@ -51,7 +51,7 @@ public class DemoFunction {
                 .body(ret, Object.class);
     }
 
-    public Mono<ServerResponse> test2(ServerRequest req){
+    public Mono<ServerResponse> test2(ServerRequest req) {
         return ok().contentType(MediaType.APPLICATION_JSON)
                 .body(healthUseCase.execute(req), Object.class);
     }

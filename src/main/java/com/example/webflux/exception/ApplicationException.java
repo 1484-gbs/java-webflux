@@ -4,11 +4,11 @@ import com.example.webflux.response.ErrorResponse;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ApplicationException extends RuntimeException{
+public class ApplicationException extends RuntimeException {
 
     @Getter
     @Setter
-    private ErrorResponse errorResponse;
+    protected ErrorResponse errorResponse;
 
     public ApplicationException(ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;

@@ -14,7 +14,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 @Component
 @AllArgsConstructor
-public class LoginFunction extends AbstractFunction{
+public class LoginFunction extends AbstractFunction {
 
     private final LoginUseCase loginUseCase;
     private final TwoFactorAuthUseCase twoFactorAuthUseCase;
