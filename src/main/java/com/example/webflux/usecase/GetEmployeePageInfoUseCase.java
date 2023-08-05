@@ -2,18 +2,19 @@ package com.example.webflux.usecase;
 
 import com.example.webflux.repository.WebClientRepository;
 import com.example.webflux.response.GetEmployeePageInfoResponse;
-import com.example.webflux.response.external.GetEmployeeResponse;
-import com.example.webflux.response.external.GetPositionsResponse;
-import com.example.webflux.response.external.GetSkillPerTypeResponse;
-import com.example.webflux.response.external.GetSkillPerTypeResponse.SkillPerTypeResponse;
-import com.example.webflux.response.external.GetSkillPerTypeResponse.SkillPerTypeResponse.SkillResponse;
+import com.example.webflux.response.GetEmployeeResponse;
+import com.example.webflux.response.GetPositionsResponse;
+import com.example.webflux.response.GetSkillPerTypeResponse;
+import com.example.webflux.response.GetSkillPerTypeResponse.SkillPerTypeResponse;
 import lombok.AllArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -29,30 +30,29 @@ public class GetEmployeePageInfoUseCase {
                 skillRepository.get(req, "/skill/per_type", GetSkillPerTypeResponse.class),
                 positionRepository.get(req, "/position", GetPositionsResponse.class)
         ).map(tuple2 -> (
-                        GetEmployeePageInfoResponse.builder()
-                                .employee(tuple2.getT1())
-                                .skills(setHasSkill(tuple2.getT1().getSkills(), tuple2.getT2().getSkills()))
-                                .positions(setEmployeePosition(tuple2.getT3(), tuple2.getT1().getPositionId()).getPositions())
+                GetEmployeePageInfoResponse.builder()
+                        .employee(tuple2.getT1())
+                        .skills(setHasSkill(tuple2.getT1().skills(), tuple2.getT2().getSkills()))
+                        .positions(setEmployeePosition(tuple2.getT3(), tuple2.getT1().positionId()).getPositions())
                                 .build()
                 )
         );
     }
 
     private SkillPerTypeResponse setHasSkill(List<Long> hasSkillIds, SkillPerTypeResponse skills) {
+        val skillMap = Stream.of(skills.getLanguage(),
+                        skills.getFramework(),
+                        skills.getDatabase(),
+                        skills.getInfra())
+                .flatMap(Collection::stream)
+                .toList();
         hasSkillIds.forEach(skillId -> {
-            getHasSkill(skills.getLanguage(), skillId).ifPresentOrElse(skill -> skill.setHasSkill(true), () -> {
-                getHasSkill(skills.getFramework(), skillId).ifPresentOrElse(skill -> skill.setHasSkill(true), () -> {
-                    getHasSkill(skills.getDatabase(), skillId).ifPresentOrElse(skill -> skill.setHasSkill(true), () -> {
-                        getHasSkill(skills.getInfra(), skillId).ifPresent(skill -> skill.setHasSkill(true));
-                    });
-                });
-            });
+            skillMap.stream()
+                    .filter(s -> s.getSkillId().equals(skillId))
+                    .findFirst()
+                    .ifPresent(s -> s.setHasSkill(true));
         });
         return skills;
-    }
-
-    private Optional<SkillResponse> getHasSkill(List<SkillResponse> skillPerType, Long skillId) {
-        return skillPerType.stream().filter(s -> skillId.equals(s.getSkillId())).findFirst();
     }
 
     private GetPositionsResponse setEmployeePosition(GetPositionsResponse positions, Long positionId) {

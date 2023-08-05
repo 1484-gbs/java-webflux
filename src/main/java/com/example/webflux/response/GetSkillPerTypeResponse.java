@@ -1,4 +1,4 @@
-package com.example.webflux.response.external;
+package com.example.webflux.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class GetSkillPerTypeResponse {
             @JsonProperty("name")
             private String skillName;
             @JsonProperty("has_skill")
-            private Boolean hasSkill;
+            private boolean hasSkill;
         }
 
     }

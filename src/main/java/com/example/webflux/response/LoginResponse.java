@@ -1,13 +1,8 @@
 package com.example.webflux.response;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public record LoginResponse(
+        String token,
+        String otpReqId
+) {
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class LoginResponse {
-    private String token;
-    private String otpReqId;
 }

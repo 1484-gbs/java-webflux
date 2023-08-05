@@ -1,8 +1,8 @@
 package com.example.webflux.usecase;
 
 import com.example.webflux.repository.WebClientRepository;
-import com.example.webflux.response.external.GetEmployeeRandomResponse;
-import com.example.webflux.response.external.GetEmployeeResponse;
+import com.example.webflux.response.GetEmployeeRandomResponse;
+import com.example.webflux.response.GetEmployeeResponse;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
@@ -28,10 +28,10 @@ public class GetEmployeeRandomUseCase {
         }
 
         return randomRepository.get(req, "/employee/random", queryParam, GetEmployeeRandomResponse.class)
-                .map(GetEmployeeRandomResponse::getEmployees)
+                .map(GetEmployeeRandomResponse::employees)
                 .flatMapMany(e -> {
                     return Flux.fromIterable(e).flatMap(e1 -> {
-                        return employeeRepository.get(req, "/employee/" + e1.getEmployeeId(), GetEmployeeResponse.class);
+                        return employeeRepository.get(req, "/employee/" + e1.employeeId(), GetEmployeeResponse.class);
                     });
                 });
     }

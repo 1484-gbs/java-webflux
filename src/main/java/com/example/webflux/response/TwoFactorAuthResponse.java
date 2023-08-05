@@ -1,12 +1,7 @@
 package com.example.webflux.response;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public record TwoFactorAuthResponse(
+        String token
+) {
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class TwoFactorAuthResponse {
-    private String token;
 }

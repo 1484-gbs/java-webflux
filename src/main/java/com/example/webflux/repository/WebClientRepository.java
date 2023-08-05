@@ -17,7 +17,7 @@ public class WebClientRepository<T1, T2> {
     public Mono<T2> post(ServerRequest req, String uri, Class<? extends T1> reqClazz, Class<? extends T2> resClazz) {
         return webClient.post()
                 .uri(uri)
-                .header(HttpHeaders.AUTHORIZATION, req.headers().firstHeader(HttpHeaders.AUTHORIZATION))
+                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader(req.headers()))
                 .body(req.bodyToMono(reqClazz), reqClazz)
                 .exchangeToMono(res -> res.bodyToMono(resClazz));
     }
@@ -36,7 +36,15 @@ public class WebClientRepository<T1, T2> {
     public Mono<T2> get(ServerRequest req, String uri, Class<? extends T2> resClazz) {
         return webClient.get()
                 .uri(uri)
-                .header(HttpHeaders.AUTHORIZATION, req.headers().firstHeader(HttpHeaders.AUTHORIZATION))
+                .header(HttpHeaders.AUTHORIZATION, getAuthorizationHeader(req.headers()))
                 .exchangeToMono(res -> res.bodyToMono(resClazz));
+    }
+
+    private String getAuthorizationHeader(ServerRequest.Headers headers) {
+        return headers.header(HttpHeaders.AUTHORIZATION)
+                .stream()
+                .filter(h -> h.startsWith("Bearer "))
+                .findFirst()
+                .orElse(null);
     }
 }
