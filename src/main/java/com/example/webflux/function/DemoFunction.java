@@ -1,5 +1,6 @@
 package com.example.webflux.function;
 
+import com.example.webflux.usecase.DemoUseCase;
 import com.example.webflux.usecase.HealthUseCase;
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -27,6 +28,8 @@ public class DemoFunction {
 
     private final HealthUseCase healthUseCase;
 
+    private final DemoUseCase demoUseCase;
+
 
     @Bean
     public RouterFunction<ServerResponse> health() {
@@ -39,6 +42,9 @@ public class DemoFunction {
                 ).andRoute(
                         GET("/health/8080"),
                         this::test2
+                ).andRoute(
+                        GET("/demo"),
+                        this::test3
                 );
     }
 
@@ -54,6 +60,10 @@ public class DemoFunction {
     public Mono<ServerResponse> test2(ServerRequest req) {
         return ok().contentType(MediaType.APPLICATION_JSON)
                 .body(healthUseCase.execute(req), Object.class);
+    }
+
+    public Mono<ServerResponse> test3(ServerRequest req) {
+        return ok().body(demoUseCase.execute(req), Object.class);
     }
 
 }
