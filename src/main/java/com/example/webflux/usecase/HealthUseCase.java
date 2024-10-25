@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.w3c.dom.Element;
 import reactor.core.publisher.Mono;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +15,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
@@ -41,12 +47,56 @@ public class HealthUseCase {
             log.info(writer.toString());
 
             val info = document.createElement("hoge");
-            info.setAttribute("value", "xml_to_string");
+            info.setAttribute("value", "1234");
+            info.setAttribute("value2", "20241018100000000946");
             root.appendChild(info);
+
+            val info2 = document.createElement("hoge");
+            info2.setAttribute("value", "1234");
+            info2.setAttribute("value2", "202410171000000009464");
+            root.appendChild(info2);
+            root.setAttribute("test", "oraora");
+            writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(writer));
+            log.info(writer.toString());
+
+            val nodeList2 = root.getElementsByTagName("hoge");
+            val document2 = dom.createDocument("", "test", null);
+            val test = document2.importNode(document.getDocumentElement(), false);
+            document2.getDocumentElement().appendChild(test);
 
             writer = new StringWriter();
             transformer.transform(new DOMSource(document), new StreamResult(writer));
             log.info(writer.toString());
+
+            IntStream.range(0, nodeList2.getLength()).mapToObj(nodeList2::item)
+                    .sorted(Comparator.comparing(item -> ((Element) item).getAttribute("value"))
+                            .thenComparing(item -> ((Element) item).getAttribute("value2")))
+                    .forEach(item -> {
+                        val hoge = document2.importNode(item, false);
+                        test.appendChild(hoge);
+                    });
+
+
+            val writer2 = new StringWriter();
+            transformer.transform(new DOMSource(document2), new StreamResult(writer2));
+            log.info(writer2.toString());
+
+            val nodeList = document.getElementsByTagName("test");
+            val testPrice = Objects.isNull(nodeList)
+                    ? BigDecimal.ZERO
+                    : IntStream.range(0, nodeList.getLength())
+                    .mapToObj(nodeList::item)
+                    .filter(item -> Objects.equals(((Element) item).getAttribute("testNo"), "testNo"))
+                    .map(item -> {
+                        log.info(((Element) item).getAttribute("testNo"));
+                        val price = ((Element) item).getAttribute("price");
+                        log.info(price);
+                        return StringUtils.hasText(price)
+                                ? new BigDecimal(price)
+                                : BigDecimal.ZERO;
+                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
