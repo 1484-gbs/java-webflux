@@ -48,12 +48,13 @@ public class HealthUseCase {
 
             val info = document.createElement("hoge");
             info.setAttribute("value", "1234");
-            info.setAttribute("value2", "20241018100000000946");
+//            info.setAttribute("value2", "20241018100000000946");
+            info.setAttribute("value2", "00");
             root.appendChild(info);
 
             val info2 = document.createElement("hoge");
             info2.setAttribute("value", "1234");
-            info2.setAttribute("value2", "202410171000000009464");
+            info2.setAttribute("value2", "02");
             root.appendChild(info2);
             root.setAttribute("test", "oraora");
             writer = new StringWriter();
@@ -69,14 +70,27 @@ public class HealthUseCase {
             transformer.transform(new DOMSource(document), new StreamResult(writer));
             log.info(writer.toString());
 
+
             IntStream.range(0, nodeList2.getLength()).mapToObj(nodeList2::item)
                     .sorted(Comparator.comparing(item -> ((Element) item).getAttribute("value"))
-                            .thenComparing(item -> ((Element) item).getAttribute("value2")))
+                            .thenComparing(item -> ((Element) item).getAttribute("value2")).reversed())
                     .forEach(item -> {
                         val hoge = document2.importNode(item, false);
                         test.appendChild(hoge);
                     });
 
+            String aaa = IntStream.range(0, nodeList2.getLength()).mapToObj(nodeList2::item)
+                    .filter(item -> Objects.equals(((Element) item).getAttribute("value"), "hoge"))
+                    .max(Comparator.comparing(item -> ((Element) item).getAttribute("value"))
+                            .thenComparing(item -> ((Element) item).getAttribute("value2")))
+                    .map(item -> "hoge")
+                    .orElseGet(() ->
+                            IntStream.range(0, nodeList2.getLength()).mapToObj(nodeList2::item)
+                                    .filter(item -> Objects.equals(((Element) item).getAttribute("value"), "hoge2"))
+                                    .findFirst()
+                                    .map(item -> "unko")
+                                    .orElse("aiueo")
+                    );
 
             val writer2 = new StringWriter();
             transformer.transform(new DOMSource(document2), new StreamResult(writer2));
