@@ -88,8 +88,8 @@ public class HealthUseCase {
                             IntStream.range(0, nodeList2.getLength()).mapToObj(nodeList2::item)
                                     .filter(item -> Objects.equals(((Element) item).getAttribute("value"), "hoge2"))
                                     .findFirst()
-                                    .map(item -> "unko")
-                                    .orElse("aiueo")
+                                    .map(item -> "gbs")
+                                    .orElse("1484")
                     );
 
             val writer2 = new StringWriter();
@@ -101,7 +101,7 @@ public class HealthUseCase {
                     ? BigDecimal.ZERO
                     : IntStream.range(0, nodeList.getLength())
                     .mapToObj(nodeList::item)
-                    .filter(item -> Objects.equals(((Element) item).getAttribute("testNo"), "testNo"))
+                    .filter(item -> Objects.equals(((Element) item).getAttribute("testNo"), "testNo2"))
                     .map(item -> {
                         log.info(((Element) item).getAttribute("testNo"));
                         val price = ((Element) item).getAttribute("price");
